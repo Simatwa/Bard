@@ -230,7 +230,7 @@ class AsyncChatbot:
         # Find "SNlM0e":"<ID>"
         if (
             not (self.secure_1psid and self.secure_1papisid)
-            or self.secure_1psid[:2] != 'g.'
+            or self.secure_1psid[:2] != "g."
         ):
             raise Exception(
                 "Enter correct __Secure_1PSID and __secure_1papisid value. __Secure_1PSID value must end with a single dot. ",
