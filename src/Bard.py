@@ -247,7 +247,7 @@ class AsyncChatbot:
         if not SNlM0e:
             raise Exception(
                 "SNlM0e value not found in response. Check __Secure_1PSID value.",
-                f" Failed with status {resp.status_code} - {resp.reason}",
+                f" Failed with status {resp.status_code} - {resp.reason_phrase}",
             )
         return SNlM0e.group(1)
 
@@ -259,7 +259,7 @@ class AsyncChatbot:
         """
         # url params
         params = {
-            "bl": "boq_assistant-Gemini-web-server_20230713.13_p0",
+            "bl": "boq_assistant-G-web-server_20230713.13_p0",
             "_reqid": str(self._reqid),
             "rt": "c",
         }
