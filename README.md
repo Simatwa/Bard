@@ -1,5 +1,5 @@
 # Bard <img src="https://www.gstatic.com/lamda/images/favicon_v1_150160cddff7f294ce30.svg" width="35px" />
-Reverse engineering of Google's Bard chatbot API
+Reverse engineering of Google's Gemini chatbot API, formerly **BARD**.
 
 ## Installation
 ```bash
@@ -11,13 +11,13 @@ Go to https://bard.google.com/
 
 - F12 for console
 - Copy the values
-  - Session: Go to Application → Cookies → `__Secure-1PSID` and `__Secure-1PAPISID`. Copy the value of those cookie.
+  - Session: Go to Application → Cookies → `__Secure-1PSID` and `__Secure-1PSIDTS`. Copy the value of those cookie.
 
 ## Usage
 
 ```bash
 $ python3 -m Bard -h
-usage: Bard.py [-h] --session <__Secure-1PSID> --session_ts <__Secure-1PAPISID>
+usage: Bard.py [-h] --session <__Secure-1PSID> --session_ts <__Secure-1PSIDTS>
 
 options:
   -h, --help         show this help message and exit
@@ -28,7 +28,7 @@ options:
 ```
 $ export BARD_QUICK="true"
 $ export BARD__Secure_1PSID="<__Secure-1PSID>"
-$ export BARD__Secure_1PSIDTS="<__Secure-1PAPISID>"
+$ export BARD__Secure_1PSIDTS="<__Secure-1PSIDTS>"
 $ python3 -m Bard
 ```
 Environment variables can be placed in .zshrc.
@@ -40,7 +40,7 @@ Example bash shortcut:
 bard () {
 	export BARD_QUICK=true
 	export BARD__Secure_1PSID=<__Secure-1PSID>
-	export BARD__Secure_1PSIDTS=<__Secure-1PAPISID>
+	export BARD__Secure_1PSIDTS=<__Secure-1PSIDTS>
 	python3 -m Bard "${@:-$(</dev/stdin)}" | tail -n+7
 }
 ```

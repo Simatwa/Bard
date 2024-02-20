@@ -56,13 +56,13 @@ class Chatbot:
     def __init__(
         self,
         secure_1psid: str,
-        secure_1papisid: str,
+        secure_1psidts: str,
         proxy: dict = None,
         timeout: int = 20,
     ):
         self.loop = asyncio.get_event_loop()
         self.async_chatbot = self.loop.run_until_complete(
-            AsyncChatbot.create(secure_1psid, secure_1papisid, proxy, timeout),
+            AsyncChatbot.create(secure_1psid, secure_1psidts, proxy, timeout),
         )
 
     def save_conversation(self, file_path: str, conversation_name: str):
@@ -86,12 +86,12 @@ class Chatbot:
 
 class AsyncChatbot:
     """
-    A class to interact with Google Bard.
+    A class to interact with Google Gemini.
     Parameters
         session: str
             The __Secure_1PSID cookie.
         session_ts: str
-            The __secure_1papisid cookie.
+            The __secure_1psidts cookie.
         proxy: str
         timeout: int
             Request timeout in seconds.
@@ -105,7 +105,7 @@ class AsyncChatbot:
         "response_id",
         "choice_id",
         "proxy",
-        "secure_1papisid",
+        "secure_1psidts",
         "secure_1psid",
         "session",
         "timeout",
@@ -114,7 +114,7 @@ class AsyncChatbot:
     def __init__(
         self,
         secure_1psid: str,
-        secure_1papisid: str,
+        secure_1psidts: str,
         proxy: dict = None,
         timeout: int = 20,
     ):
@@ -122,17 +122,17 @@ class AsyncChatbot:
 
         Args:
             secure_1psid (str): __Secure-1PSID cookie value
-            secure_1papisid (str): __Secure-1PAPISID cookie value
+            secure_1psidts (str): __Secure-1PSIDTS cookie value
             proxy (dict, optional): Http request proxy. Defaults to None.
             timeout (int, optional): htpp request timeout. Defaults to 20.
         """
         headers = {
-            "Host": "bard.google.com",
+            "Content-Type": "application/x-www-form-urlencoded;charset=utf-8",
+            "Host": "gemini.google.com",
+            "Origin": "https://gemini.google.com",
+            "Referer": "https://gemini.google.com/",
+            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
             "X-Same-Domain": "1",
-            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.114 Safari/537.36",
-            "Content-Type": "application/x-www-form-urlencoded;charset=UTF-8",
-            "Origin": "https://bard.google.com",
-            "Referer": "https://bard.google.com/",
         }
         self._reqid = int("".join(random.choices(string.digits, k=4)))
         self.proxy = proxy
@@ -140,26 +140,25 @@ class AsyncChatbot:
         self.response_id = ""
         self.choice_id = ""
         self.secure_1psid = secure_1psid
-        self.secure_1papisid = secure_1papisid
+        self.secure_1psidts = secure_1psidts
         self.session = httpx.AsyncClient(proxies=self.proxy)
         self.session.headers = headers
         self.session.cookies.set("__Secure-1PSID", secure_1psid)
-        if secure_1papisid:
-            self.session.cookies.set("__Secure-1PAPISID", secure_1papisid)
+        self.session.cookies.set("__Secure-1PSIDTS", secure_1psidts)
         self.timeout = timeout
 
     @classmethod
     async def create(
         cls,
         secure_1psid: str,
-        secure_1papisid: str,
+        secure_1psidts: str,
         proxy: dict = None,
         timeout: int = 20,
     ) -> "AsyncChatbot":
         """
         Async constructor.
         """
-        instance = cls(secure_1psid, secure_1papisid, proxy, timeout)
+        instance = cls(secure_1psid, secure_1psidts, proxy, timeout)
         instance.SNlM0e = await instance.__get_snlm0e()
         return instance
 
@@ -229,14 +228,14 @@ class AsyncChatbot:
     async def __get_snlm0e(self):
         # Find "SNlM0e":"<ID>"
         if (
-            not (self.secure_1psid and self.secure_1papisid)
+            not (self.secure_1psid and self.secure_1psidts)
             or self.secure_1psid[:2] != "g."
         ):
             raise Exception(
-                "Enter correct __Secure_1PSID and __secure_1papisid value. __Secure_1PSID value must end with a single dot. ",
+                "Enter correct __Secure_1PSID and __Secure_1PSIDTS value. __Secure_1PSID value must start with a g dot (g.). ",
             )
         resp = await self.session.get(
-            "https://bard.google.com/",
+            "https://gemini.google.com/app",
             timeout=10,
             follow_redirects=True,
         )
@@ -244,22 +243,23 @@ class AsyncChatbot:
             raise Exception(
                 f"Response code not 200. Response Status is {resp.status_code}",
             )
-        SNlM0e = re.search(r"SNlM0e\":\"(.*?)\"", resp.text)
+        SNlM0e = re.search(r'"SNlM0e":"(.*?)"', resp.text)
         if not SNlM0e:
             raise Exception(
                 "SNlM0e value not found in response. Check __Secure_1PSID value.",
+                f" Failed with status {resp.status_code} - {resp.reason}",
             )
         return SNlM0e.group(1)
 
     async def ask(self, message: str) -> dict:
         """
-        Send a message to Google Bard and return the response.
-        :param message: The message to send to Google Bard.
-        :return: A dict containing the response from Google Bard.
+        Send a message to Google Gemini and return the response.
+        :param message: The message to send to Google Gemini.
+        :return: A dict containing the response from Google Gemini.
         """
         # url params
         params = {
-            "bl": "boq_assistant-bard-web-server_20230713.13_p0",
+            "bl": "boq_assistant-Gemini-web-server_20230713.13_p0",
             "_reqid": str(self._reqid),
             "rt": "c",
         }
@@ -275,14 +275,14 @@ class AsyncChatbot:
             "at": self.SNlM0e,
         }
         resp = await self.session.post(
-            "https://bard.google.com/_/BardChatUi/data/assistant.lamda.BardFrontendService/StreamGenerate",
+            "https://gemini.google.com/_/BardChatUi/data/assistant.lamda.BardFrontendService/StreamGenerate",
             params=params,
             data=data,
             timeout=self.timeout,
         )
         chat_data = json.loads(resp.content.splitlines()[3])[0][2]
         if not chat_data:
-            return {"content": f"Google Bard encountered an error: {resp.content}."}
+            return {"content": f"Gemini encountered an error: {resp.content}."}
         json_chat_data = json.loads(chat_data)
         images = []
         if len(json_chat_data) >= 3:
@@ -309,22 +309,22 @@ class AsyncChatbot:
 if __name__ == "__main__":
     print(
         """
-        Bard - A command-line interface to Google's Bard (https://bard.google.com/)
-        Repo: github.com/acheong08/Bard
+        Gemini - A command-line interface to Google's Gemini (https://gemini.google.com/)
+        Repo: github.com/Simatwa/Bard
 
         Enter `alt+enter` or `esc+enter` to send a message.
         """,
     )
     console = Console()
-    if os.getenv("BARD_QUICK"):
-        Secure_1PSID = os.getenv("BARD__Secure_1PSID")
-        secure_1papisid = os.getenv("BARD__secure_1papisid")
-        if not (Secure_1PSID and secure_1papisid):
+    if os.getenv("Gemini_QUICK"):
+        Secure_1PSID = os.getenv("Gemini__Secure_1PSID")
+        secure_1psidts = os.getenv("Gemini__secure_1psidts")
+        if not (Secure_1PSID and secure_1psidts):
             print(
-                "BARD__Secure_1PSID or BARD__secure_1papisid environment variable not set.",
+                "Gemini__Secure_1PSID or Gemini__secure_1psidts environment variable not set.",
             )
             sys.exit(1)
-        chatbot = Chatbot(Secure_1PSID, secure_1papisid)
+        chatbot = Chatbot(Secure_1PSID, secure_1psidts)
         # Join arguments into a single string
         MESSAGE = " ".join(sys.argv[1:])
         response = chatbot.ask(MESSAGE)
@@ -340,7 +340,7 @@ if __name__ == "__main__":
     )
     parser.add_argument(
         "--session_ts",
-        help="__secure_1papisid cookie.",
+        help="__secure_1psidts cookie.",
         type=str,
         required=True,
     )
@@ -362,7 +362,7 @@ if __name__ == "__main__":
                 chatbot.response_id = ""
                 chatbot.choice_id = ""
                 continue
-            print("Google Bard:")
+            print("Google Gemini:")
             response = chatbot.ask(user_prompt)
             console.print(Markdown(response["content"]))
             console.print(response["images"] if response.get("images") else "")

@@ -3,12 +3,12 @@ from setuptools import setup
 
 setup(
     name="GoogleBard1",
-    version="2.1.1",
+    version="2.1.2",
     license="MIT License",
     author="Antonio Cheong",
     author_email="acheong@student.dalat.org",
-    maintainer='Smartwa',
-    maintainer_email='simatwacaleb@proton.me',
+    maintainer="Smartwa",
+    maintainer_email="simatwacaleb@proton.me",
     description="Reverse engineering of Google's Bard chatbot",
     packages=find_packages("src"),
     package_dir={"": "src"},
