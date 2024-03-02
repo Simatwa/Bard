@@ -17,11 +17,13 @@ Go to https://bard.google.com/
 
 ```bash
 $ python3 -m Bard -h
-usage: Bard.py [-h] --session <__Secure-1PSID> --session_ts <__Secure-1PSIDTS>
+usage: Bard.py [-h] --session SESSION --session_ts SESSION_TS
 
 options:
-  -h, --help         show this help message and exit
-  --session --session_ts       pass two cookies
+  -h, --help            show this help message and exit
+  --session SESSION     __Secure-1PSID cookie
+  --session_ts SESSION_TS
+                        __secure_1psidts cookie.
 ```
 
 ### Quick mode
