@@ -78,6 +78,9 @@ async def main():
 asyncio.run(main())
 ```
 
+> [!IMPORTANT]
+> The cookies expire after a short period; ensure you update them as frequent as possible.
+
 ## [Developer Documentation](https://github.com/Simatwa/Bard/blob/main/DOCUMENTATION.md)
 
 Credits:

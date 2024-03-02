@@ -247,6 +247,7 @@ class AsyncChatbot:
         if not SNlM0e:
             raise Exception(
                 "SNlM0e value not found in response. Check __Secure_1PSID value."
+                "\nNOTE : The cookies expire after a short period; ensure you update them as frequent as possible."
                 f" Failed with status {resp.status_code} - {resp.reason_phrase}",
             )
         return SNlM0e.group(1)
