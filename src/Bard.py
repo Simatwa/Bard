@@ -243,7 +243,7 @@ class AsyncChatbot:
             raise Exception(
                 f"Response code not 200. Response Status is {resp.status_code}",
             )
-        SNlM0e = re.search(r"SNlM0e\":\"(.*?)\"", resp.text)
+        SNlM0e = re.search(r'"SNlM0e":"(.*?)"', resp.text)
         if not SNlM0e:
             raise Exception(
                 "SNlM0e value not found in response. Check __Secure_1PSID value."
